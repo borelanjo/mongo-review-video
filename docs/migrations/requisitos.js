@@ -350,92 +350,128 @@ db.video.find(
 // 4. 01 consulta com filtro, projeção e uso de expressão regular
 
 // 4.1 Busca de login e cidade de usuários que nasceram em uma cidade iniciado com Jo retornando em formato json
-db.usuario.find({cidade : {$regex: "Jo" }}, {login: 1, cidade: 1}).forEach(printjson);
+db.usuario
+  .find({ cidade: { $regex: "Jo" } }, { login: 1, cidade: 1 })
+  .forEach(printjson);
 
 // 5. Consultas com acesso a array de elementos
 
 // 5.1 Media de indicação por gêneros
-db.video.aggregate([
-    {$group:{
+db.video
+  .aggregate([
+    {
+      $group: {
         _id: "$genero",
-        media_censura_por_generos: {$avg: "$censura"}
-        }}
-        ]).forEach(printjson);
+        media_censura_por_generos: { $avg: "$censura" },
+      },
+    },
+  ])
+  .forEach(printjson);
 
 // 6. 02 consultas com acesso a estrutura embutida
+
+db.video.aggregate([
+  {
+    $lookup: {
+      from: "avaliacao",
+      localField: "_id",
+      foreignField: "video",
+      as: "avaliacoes",
+    },
+  },
+]);
+
+db.avaliacao.aggregate([
+  {
+    $lookup: {
+      from: "usuario",
+      localField: "usuario",
+      foreignField: "_id",
+      as: "avaliador",
+    },
+  },
+
+  {
+    $lookup: {
+      from: "video",
+      localField: "video",
+      foreignField: "_id",
+      as: "videoAvaliado",
+    },
+  },
+]);
 
 // 7. 02 consultas diferentes com aggregate
 // 7.1 Média das avaliações
 db.avaliacao.aggregate([
-    {
-        $group: {
-            _id: '$video',
-            notaMedia: {
-                $avg: '$nota'
-            }
-        }
-    }
+  {
+    $group: {
+      _id: "$video",
+      notaMedia: {
+        $avg: "$nota",
+      },
+    },
+  },
 ]);
 
 // 7.2 Total e média de avaliações dos filmes ordenados pelo ano
 db.avaliacao.aggregate([
-    {
-        $group: {
-            _id: {
-                video: '$video'
-            },
-            notaMedia: {
-                $avg: '$nota'
-            },
-            totalAvaliacoes: {
-                $sum: 1
-            }
-        }
+  {
+    $group: {
+      _id: {
+        video: "$video",
+      },
+      notaMedia: {
+        $avg: "$nota",
+      },
+      totalAvaliacoes: {
+        $sum: 1,
+      },
     },
-    {
-        $lookup: {
-            from: 'video',
-            localField: '_id.video',
-            foreignField: '_id',
-            as: 'videoAvaliado'
-        }
+  },
+  {
+    $lookup: {
+      from: "video",
+      localField: "_id.video",
+      foreignField: "_id",
+      as: "videoAvaliado",
     },
-    {
-        $project: {
-            _id: 0,
-            videoAvaliado: {
-                $arrayElemAt: ["$videoAvaliado", 0]
-            },
-            notaMedia: 1,
-            totalAvaliacoes: 1
-        }
+  },
+  {
+    $project: {
+      _id: 0,
+      videoAvaliado: {
+        $arrayElemAt: ["$videoAvaliado", 0],
+      },
+      notaMedia: 1,
+      totalAvaliacoes: 1,
     },
-    {
-        $sort: {
-            'videoAvaliado.ano': 1
-        }
-    }
-])
+  },
+  {
+    $sort: {
+      "videoAvaliado.ano": 1,
+    },
+  },
+]);
 
 // 8. 01 consulta com lookup
 
 db.video.aggregate([
-    {$match: {"codigo":8001}},
-        {
-            $lookup: {
-                from: 'avaliacao',
-                localField: '_id',
-                foreignField: 'video',
-                as: 'avaliacoes'
-            }
-        }
-    ]);
+  { $match: { codigo: 8001 } },
+  {
+    $lookup: {
+      from: "avaliacao",
+      localField: "_id",
+      foreignField: "video",
+      as: "avaliacoes",
+    },
+  },
+]);
 
 // 9. 01 consulta a seu critério explicando o porquê dela.
 
 //** Achamos importante demonstrar uma consulta com paginação */
 
 db.usuario.find().limit(10).skip(0); // busca com paginação
-
 
 db.video.find().limit(10).skip(0); // busca com paginação
