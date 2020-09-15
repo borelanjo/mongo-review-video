@@ -6,7 +6,7 @@ Projeto da Pós de Especialização em Desenvolvimento Web. Ele consiste em um b
 
 - [Elton Leite](https://github.com/borelanjo);
 - [Juan Carlos](https://github.com/juancarllos88);
-- [Fagner Limna](https://github.com/fagnerlima).
+- [Fagner Lima](https://github.com/fagnerlima).
 
 ## Instruções
 
@@ -16,7 +16,7 @@ Esse projeto foi feito utilizando docker + mongodb. Casos você tenha o docker e
 docker-compose up -d
 ```
 
-Esse comando iniciará um container mongo e executará o conteúdo do `mongo-init.js` que criarar os usuários administradores `borelanjo`, `juancarllos88` e `fagnerlima`. Além disso ele criará as collections: `usuario`, `video` e  `avaliacao`.
+Esse comando iniciará um container mongo e executará o conteúdo do `mongo-init.js` que criará os usuários administradores `borelanjo`, `juancarllos88` e `fagnerlima`. Além disso ele criará as collections: `usuario`, `video` e  `avaliacao`.
 
 Caso você não tenha o docker instalado você pode executar o `mongo-init.js` em sua própria instância do mongo.
 
